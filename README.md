@@ -72,4 +72,11 @@ public partial struct MyValueType
     private partial ReadOnlySpan<char> Clean(ReadOnlySpan<char> value) => Helper.Clean.RemoveNonDigits(value);
     private partial bool ValueIsValid(ReadOnlySpan<char> value) => Helper.Validate.IsMatch(value, new Regex(@"^\d{3}$"));
 } 
+
+var value = MyValueType.Parse("123");
+Console.WriteLine(value); // 123
+value.IsValid; // true
+var sameValue = MyValueType.Parse("123");
+Console.WriteLine(value == sameValue); // true
+var stringValue = (string) value; // Or value.ToString();
 ```

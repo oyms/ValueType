@@ -14,4 +14,4 @@ public partial struct MyValueType
 
 [Documentation on GitHub](https://github.com/oyms/ValueType/blob/main/README.md)
 
-![Icon](https://raw.githubusercontent.com/oyms/ValueType/refs/heads/main/.idea/.idea.ValueType/.idea/icon.svg)
+![Icon](https://raw.githubusercontent.com/oyms/ValueType/refs/heads/main/resources/logo.svg)
