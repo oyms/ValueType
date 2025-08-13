@@ -16,6 +16,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <AdditionalFiles Include="AnalyzerReleases.Shipped.md"  />
+    </ItemGroup>
+
+    <ItemGroup>
         <None Include="$(TargetPath)" Pack="true" PackagePath="analyzers/dotnet/cs/" />
     </ItemGroup>
     

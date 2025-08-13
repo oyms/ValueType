@@ -11,12 +11,12 @@ namespace Skaar.ValueType;
 [Generator]
 public class Generator : IIncrementalGenerator
 {
-    private static readonly string AttributeName = "ValueTypeAttribute";
+    public static readonly string AttributeName = "ValueTypeAttribute";
     private static readonly string InterfaceName = "IValueType";
     private static readonly string TypeConverterName = "ParsableTypeConverter";
     private static readonly string JsonConverterName = "ParsableJsonConverter";
     private static readonly string HelperName = "Helper";
-    private static readonly string AttributeNamespace = "Skaar.ValueType";
+    public static readonly string AttributeNamespace = "Skaar.ValueType";
     string ToolName => Assembly.GetExecutingAssembly().GetName().Name;
     Version ToolVersion => Assembly.GetExecutingAssembly().GetName().Version;
     
@@ -43,6 +43,7 @@ public class Generator : IIncrementalGenerator
             .Where(s => s is not null && s.GetAttributes()
                 .Any(attr => attr.AttributeClass?.ToDisplayString() == $"{AttributeNamespace}.{AttributeName}")
             )
+            .Where(s => s.ContainingType is null)
             .Collect();
         
         context.RegisterSourceOutput(structDeclarations, (productionContext, structSymbols) =>
@@ -134,6 +135,9 @@ public class Generator : IIncrementalGenerator
                     
                     #region Clean
                     
+                    /// <summary>
+                    /// Cleans the input value according to the specified cleaning rules.
+                    /// </summary>
                     private partial ReadOnlySpan<char> Clean(ReadOnlySpan<char> value);
                     
                     #endregion
@@ -144,6 +148,9 @@ public class Generator : IIncrementalGenerator
                     
                     public bool IsValid => ValueIsValid(_value.Span);
                     
+                    /// <summary>
+                    /// Checks if the value is valid according to the specified validation rules.
+                    /// </summary>
                     private partial bool ValueIsValid(ReadOnlySpan<char> value);
                     
                     
@@ -363,13 +370,34 @@ public class Generator : IIncrementalGenerator
            [GeneratedCode("{{ToolName}}", "{{ToolVersion}}")]
            internal static class {{helperName}}
            {
+                /// <summary>
+                /// Provides methods for cleaning.
+                /// </summary>
                 public static class Clean
                 {
+                    /// <summary>
+                    /// A trivial implementation that returns the value unchanged.
+                    /// </summary>
                     public static ReadOnlySpan<char> Default(ReadOnlySpan<char> value) => value;
-                    public static ReadOnlySpan<char> RemoveNonDigits(ReadOnlySpan<char> rawValue) => Filter(rawValue, char.IsDigit);     
+                    /// <summary>
+                    /// Removes all non-digit characters from the input value.
+                    /// </summary>
+                    public static ReadOnlySpan<char> RemoveNonDigits(ReadOnlySpan<char> rawValue) => Filter(rawValue, char.IsDigit); 
+                    /// <summary>   
+                    /// Removes all non-letter and non-digit characters from the input value.
+                    /// </summary>
                     public static ReadOnlySpan<char> RemoveNonLettersOrDigits(ReadOnlySpan<char> rawValue) => Filter(rawValue, char.IsLetterOrDigit);     
+                    /// <summary>
+                    /// Removes all whitespace characters from the input value.
+                    /// </summary>
                     public static ReadOnlySpan<char> RemoveWhitespace(ReadOnlySpan<char> rawValue) => Filter(rawValue, c => !char.IsWhiteSpace(c));
+                    /// <summary>
+                    /// Trims whitespace from the start and end of the input value.
+                    /// </summary>
                     public static ReadOnlySpan<char> Trim(ReadOnlySpan<char> rawValue) => rawValue.Trim();
+                    /// <summary>
+                    /// Filters the input value based on a predicate.
+                    /// </summary>
                     public static ReadOnlySpan<char> Filter(ReadOnlySpan<char> rawValue, Predicate<char> predicate)
                     {
                         var buffer = rawValue.Length <= 256 ? stackalloc char[rawValue.Length] : new char[rawValue.Length];
@@ -388,10 +416,22 @@ public class Generator : IIncrementalGenerator
                     }
                 }
             
+                /// <summary>
+                /// Provides methods for validation.
+                /// </summary>
                 public static class Validate
                 {
+                    /// <summary>
+                    /// The value is valid if it is not empty.
+                    /// </summary>
                     public static bool Default(ReadOnlySpan<char> value) => !value.IsEmpty;
+                    /// <summary>
+                    /// Checks if the value contains only digits.
+                    /// </summary>
                     public static bool IsDigits(ReadOnlySpan<char> value) => All(value, char.IsDigit);
+                    /// <summary>
+                    /// Validates all characters based on a predicate.
+                    /// </summary>
                     public static bool All(ReadOnlySpan<char> value, Predicate<char> predicate)
                     {
                         foreach (var c in value)
@@ -403,6 +443,9 @@ public class Generator : IIncrementalGenerator
                         }
                         return true;
                     }
+                    /// <summary>
+                    /// Validates if the value matches a regular expression.
+                    /// </summary>
                     public static bool IsMatch(ReadOnlySpan<char> value, Regex regex) => regex.IsMatch(value);
                 }
         }
