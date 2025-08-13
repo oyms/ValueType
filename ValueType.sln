@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skaar.ValueType.Tests", "tests\Skaar.ValueType.Tests\Skaar.ValueType.Tests.csproj", "{C4490CAD-7A55-42E7-AEB0-92465BC3BEBC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skaar.ValueType", "src\Skaar.ValueType\Skaar.ValueType.csproj", "{00631AE9-A8FA-4044-8D21-90600D083E55}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{EC6B5303-1643-4740-8579-E78411933D97}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+		README.md = README.md
+		src\CommonProps.targets = src\CommonProps.targets
+		resources\logo.png = resources\logo.png
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A1C72912-07EA-465B-B77F-657F53C1D357}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1C72912-07EA-465B-B77F-657F53C1D357}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1C72912-07EA-465B-B77F-657F53C1D357}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1C72912-07EA-465B-B77F-657F53C1D357}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4490CAD-7A55-42E7-AEB0-92465BC3BEBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4490CAD-7A55-42E7-AEB0-92465BC3BEBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4490CAD-7A55-42E7-AEB0-92465BC3BEBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4490CAD-7A55-42E7-AEB0-92465BC3BEBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00631AE9-A8FA-4044-8D21-90600D083E55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00631AE9-A8FA-4044-8D21-90600D083E55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00631AE9-A8FA-4044-8D21-90600D083E55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00631AE9-A8FA-4044-8D21-90600D083E55}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
