@@ -73,10 +73,10 @@ public partial struct MyValueType
     private partial bool ValueIsValid(ReadOnlySpan<char> value) => Helper.Validate.IsMatch(value, new Regex(@"^\d{3}$"));
 } 
 
-var value = MyValueType.Parse("123");
+var value = MyValueType.Parse("123a");
 Console.WriteLine(value); // 123
 value.IsValid; // true
-var sameValue = MyValueType.Parse("123");
+var sameValue = MyValueType.Parse("123b");
 Console.WriteLine(value == sameValue); // true
 var stringValue = (string) value; // Or value.ToString();
 ```
