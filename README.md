@@ -80,3 +80,28 @@ var sameValue = MyValueType.Parse("123b");
 Console.WriteLine(value == sameValue); // true
 var stringValue = (string) value; // Or value.ToString();
 ```
+
+### Custom constructor
+
+If a custom constructor is required (for instance, to set other properties),
+this can be defined, and the partial generated part will omit the constructor.
+
+The constructor must have the same signature as the generated one:
+
+`GeneratorTestsTargetType2(ReadOnlySpan<char> value)`, and it should set 
+the field `_value`. It can be private or public.
+
+```C#
+[ValueType]
+public partial struct GeneratorTestsTargetType2
+{
+    private GeneratorTestsTargetType2(ReadOnlySpan<char> value)
+    {
+        _value = Clean(value).ToArray();
+        WasSetInCtor = true;
+    }
+    private partial ReadOnlySpan<char> Clean(ReadOnlySpan<char> value) => Helper.Clean.Trim(value);
+    private partial bool ValueIsValid(ReadOnlySpan<char> value) => Helper.Validate.Default(value);
+    public bool WasSetInCtor { get; }
+}
+```

@@ -15,7 +15,7 @@ public class Analyzer : DiagnosticAnalyzer
         id: "VALUETYPE001",
         title: "Invalid Visibility",
         messageFormat:
-        $"Structs decorated with the [{Generator.AttributeName}] attribute must be public or internal.",
+        $"Structs decorated with the [{StringBased.Generator.AttributeName}] attribute must be public or internal.",
         category: "Usage",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);    
@@ -24,7 +24,7 @@ public class Analyzer : DiagnosticAnalyzer
         id: "VALUETYPE002",
         title: "Nested type",
         messageFormat:
-        $"Structs decorated with the [{Generator.AttributeName}] cannot be nested in another type.",
+        $"Structs decorated with the [{StringBased.Generator.AttributeName}] cannot be nested in another type.",
         category: "Usage",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);   
@@ -33,7 +33,7 @@ public class Analyzer : DiagnosticAnalyzer
         id: "VALUETYPE003",
         title: "Not partial",
         messageFormat:
-        $"Structs decorated with the [{Generator.AttributeName}] must be partial.",
+        $"Structs decorated with the [{StringBased.Generator.AttributeName}] must be partial.",
         category: "Usage",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);    
@@ -42,7 +42,7 @@ public class Analyzer : DiagnosticAnalyzer
         id: "VALUETYPE004",
         title: "Record struct",
         messageFormat:
-        $"Record structs decorated with the [{Generator.AttributeName}] are not supported.",
+        $"Record structs decorated with the [{StringBased.Generator.AttributeName}] are not supported.",
         category: "Usage",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
@@ -122,42 +122,10 @@ public class Analyzer : DiagnosticAnalyzer
 
             var hasAttribute = symbol.GetAttributes()
                 .Any(attr => attr.AttributeClass?.ToDisplayString() ==
-                             $"{Generator.AttributeNamespace}.{Generator.AttributeName}");
+                             $"{Generator.AttributeNamespace}.{StringBased.Generator.AttributeName}");
             if (!hasAttribute)
                 return;
             action.Invoke(ctx, symbol, typeDeclaration);
         };
-    }
-
-    private void AnalyzeDecoratedStruct(SyntaxNodeAnalysisContext context)
-    {
-        var typeDeclaration = (TypeDeclarationSyntax)context.Node;
-
-        if (!typeDeclaration.AttributeLists.Any())
-            return;
-
-        var model = context.SemanticModel;
-        var symbol = ModelExtensions.GetDeclaredSymbol(model, typeDeclaration);
-        if (symbol == null)
-            return;
-
-        var hasAttribute = symbol.GetAttributes()
-            .Any(attr => attr.AttributeClass?.ToDisplayString() ==
-                         $"{Generator.AttributeNamespace}.{Generator.AttributeName}");
-        if (!hasAttribute)
-            return;
-
-        var isPublicOrInternal = symbol.DeclaredAccessibility == Accessibility.Public ||
-                                 symbol.DeclaredAccessibility == Accessibility.Internal;
-
-        var isPartial = typeDeclaration.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
-
-        if (!isPublicOrInternal || !isPartial)
-        {
-            context.ReportDiagnostic(Diagnostic.Create(
-                InvalidVisibility,
-                typeDeclaration.Identifier.GetLocation()
-            ));
-        }
     }
 }

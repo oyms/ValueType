@@ -47,6 +47,13 @@ public class GeneratorTests
         Assert.Equal("123-45-6789", x);
         Assert.True(x.IsValid);
     }
+
+    [Fact]
+    public void CustomConstructor()
+    {
+        var x = GeneratorTestsTargetType2.Parse("Hello World");
+        Assert.True(x.WasSetInCtor);
+    }
 }
 
 [ValueType]
@@ -57,11 +64,24 @@ public partial struct GeneratorTestsTargetType0
 }
 
 [ValueType]
-internal partial struct GeneratorTestsTargetType1
+public partial struct GeneratorTestsTargetType1
 {
     private partial ReadOnlySpan<char> Clean(ReadOnlySpan<char> value) => Helper.Clean.Filter(value, c => !char.IsLetter(c));
     private partial bool ValueIsValid(ReadOnlySpan<char> value) => Helper.Validate.IsMatch(value, MyRegex());
     [GeneratedRegex(@"^\d{3}-\d{2}-\d{4}$")]
     private static partial Regex MyRegex();
+}
+
+[ValueType]
+public partial struct GeneratorTestsTargetType2
+{
+    private GeneratorTestsTargetType2(ReadOnlySpan<char> value)
+    {
+        _value = Clean(value).ToArray();
+        WasSetInCtor = true;
+    }
+    private partial ReadOnlySpan<char> Clean(ReadOnlySpan<char> value) => Helper.Clean.Trim(value);
+    private partial bool ValueIsValid(ReadOnlySpan<char> value) => Helper.Validate.Default(value);
+    public bool WasSetInCtor { get; }
 }
 
