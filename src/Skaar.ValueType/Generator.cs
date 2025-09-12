@@ -21,5 +21,8 @@ public class Generator : IIncrementalGenerator
         stringBasedSource.GenerateConverters(context);
         stringBasedSource.GenerateHelper(context);
         stringBasedSource.GenerateStructFiles(context);
+
+        var valueBasedSource = new ValueTypeBased.Generator(AttributeNamespace);
+        valueBasedSource.GenerateStructFiles(context);
     }
 }

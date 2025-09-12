@@ -1,23 +1,19 @@
-using System;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
+#nullable enable
+
 namespace Skaar.ValueType.StringBased;
 
-internal class Generator(string @namespace)
+internal class Generator(string @namespace) : Common.Generator(@namespace)
 {
-    public static readonly string AttributeName = "ValueTypeAttribute";
     private static readonly string InterfaceName = "IValueType";
     private static readonly string TypeConverterName = "ParsableTypeConverter";
     private static readonly string JsonConverterName = "ParsableJsonConverter";
     private static readonly string HelperName = "Helper";
-    
-    string ToolName => Assembly.GetExecutingAssembly().GetName().Name;
-    Version ToolVersion => Assembly.GetExecutingAssembly().GetName().Version;
     
     public void GenerateStructFiles(IncrementalGeneratorInitializationContext context)
     {
@@ -31,50 +27,20 @@ internal class Generator(string @namespace)
                     return symbol;
                 })
             .Where(s => s is not null && s.GetAttributes()
-                .Any(attr => attr.AttributeClass?.ToDisplayString() == $"{@namespace}.{AttributeName}")
+                .Any(attr => attr.AttributeClass?.ToDisplayString() == $"{Ns}.{AttributeName}")
             )
-            .Where(s => s.ContainingType is null)
+            .Where(s => s!.ContainingType is null)
             .Collect();
         
         context.RegisterSourceOutput(structDeclarations, (productionContext, structSymbols) =>
         {
-            foreach (var structSymbol in structSymbols)
+            foreach (var structSymbol in structSymbols.Where(s => s is not null))
             {
-                var typeName = structSymbol.Name;
+                var typeName = structSymbol!.Name;
                 var ns = structSymbol.ContainingNamespace.ToDisplayString();
                 var hasConstructorDefined = HasConstructorDefined(structSymbol as INamedTypeSymbol);
                 productionContext.AddSource($"{ns}.{typeName}.g.cs", SourceText.From(StructSource(ns, typeName, !hasConstructorDefined), Encoding.UTF8));
             }
-        });
-    }
-
-    private bool HasConstructorDefined(INamedTypeSymbol? symbol)
-    {
-        if(symbol is null) return false;
-        return symbol.InstanceConstructors.Any(ctor => 
-        {
-           if(ctor.IsStatic) return false;
-           if (ctor.Parameters.Length != 1) return false;
-           var pType = ctor.Parameters[0].Type;
-           if (pType is INamedTypeSymbol named &&
-               named.IsGenericType &&
-               named.Name == nameof(ReadOnlySpan<char>) &&
-               named.ContainingNamespace.ToDisplayString() == "System" &&
-               named.TypeArguments.Length == 1 &&
-               named.TypeArguments[0].SpecialType == SpecialType.System_Char)
-           {
-               return true;
-           }
-           return false;
-
-        });
-    }
-
-    public void GenerateAttributeFiles(IncrementalGeneratorInitializationContext context)
-    {
-        context.RegisterPostInitializationOutput(ctx =>
-        {
-            ctx.AddSource($"{AttributeName}.g.cs", SourceText.From(AttributeSource(AttributeName), Encoding.UTF8));
         });
     }
 
@@ -112,154 +78,134 @@ internal class Generator(string @namespace)
             ? $"private {structName}(ReadOnlySpan<char> value) => _value = Clean(value).ToArray();"
             : "";
         return $$"""
-            using System;
-            using System.CodeDom.Compiler;
-            using System.ComponentModel;
-            using System.Diagnostics;
-            using System.Diagnostics.CodeAnalysis;
-            using System.Numerics;
-            using System.Text.Json.Serialization;
+        using System;
+        using System.ComponentModel;
+        using System.Diagnostics;
+        using System.Diagnostics.CodeAnalysis;
+        using System.Numerics;
+        using System.Text.Json.Serialization;
+        
+        #nullable enable
+        
+        namespace {{structNamespace}};
+        
+        /// <summary>
+        /// A value type wrapping a string value
+        /// </summary>
+        {{GeneratedCodeAttribute}}
+        [JsonConverter(typeof({{Ns}}.{{JsonConverterName}}<{{structName}}>))]
+        [TypeConverter(typeof({{Ns}}.{{TypeConverterName}}<{{structName}}>))]
+        readonly partial struct {{structName}} :
+            {{Ns}}.{{InterfaceName}},
+            ISpanParsable<{{structName}}>,
+            IEquatable<{{structName}}>,
+            IEqualityOperators<{{structName}}, {{structName}}, bool>
+        {
+            {{ctor}}
+        
+            [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+            private readonly ReadOnlyMemory<char> _value;
             
-            #nullable enable
+            ReadOnlySpan<char> {{Ns}}.{{InterfaceName}}.Span => _value.Span;
             
-            namespace {{structNamespace}}
+            #region Clean
+            
+            /// <summary>
+            /// Cleans the input value according to the specified cleaning rules.
+            /// </summary>
+            private partial ReadOnlySpan<char> Clean(ReadOnlySpan<char> value);
+            
+            #endregion
+            
+            #region Validate
+            
+            public int Length => _value.Length;
+            
+            public bool IsValid => ValueIsValid(_value.Span);
+            
+            /// <summary>
+            /// Checks if the value is valid according to the specified validation rules.
+            /// </summary>
+            private partial bool ValueIsValid(ReadOnlySpan<char> value);
+            
+            
+            #endregion
+            
+            #region Parse
+            
+            public static {{structName}} Parse(ReadOnlySpan<char> s, IFormatProvider? provider = null)
             {
-                /// <summary>
-                /// A value type wrapping a string value
-                /// </summary>
-                [GeneratedCode("{{ToolName}}", "{{ToolVersion}}")]
-                [JsonConverter(typeof({{@namespace}}.{{JsonConverterName}}<{{structName}}>))]
-                [TypeConverter(typeof({{@namespace}}.{{TypeConverterName}}<{{structName}}>))]
-                readonly partial struct {{structName}} :
-                    {{@namespace}}.{{InterfaceName}},
-                    ISpanParsable<{{structName}}>,
-                    IEquatable<{{structName}}>,
-                    IEqualityOperators<{{structName}}, {{structName}}, bool>
+                if (!TryParse(s, provider, out var result) && !result.IsValid)
                 {
-                    {{ctor}}
-                
-                    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-                    private readonly ReadOnlyMemory<char> _value;
-                    
-                    ReadOnlySpan<char> {{@namespace}}.{{InterfaceName}}.Span => _value.Span;
-                    
-                    #region Clean
-                    
-                    /// <summary>
-                    /// Cleans the input value according to the specified cleaning rules.
-                    /// </summary>
-                    private partial ReadOnlySpan<char> Clean(ReadOnlySpan<char> value);
-                    
-                    #endregion
-                    
-                    #region Validate
-                    
-                    public int Length => _value.Length;
-                    
-                    public bool IsValid => ValueIsValid(_value.Span);
-                    
-                    /// <summary>
-                    /// Checks if the value is valid according to the specified validation rules.
-                    /// </summary>
-                    private partial bool ValueIsValid(ReadOnlySpan<char> value);
-                    
-                    
-                    #endregion
-                    
-                    #region Parse
-                    
-                    public static {{structName}} Parse(ReadOnlySpan<char> s, IFormatProvider? provider = null)
-                    {
-                        if (!TryParse(s, provider, out var result) && !result.IsValid)
-                        {
-                            throw new FormatException("String is not a valid {{structName}}.");
-                        }
-                        
-                        return result;
-                    }
-                    
-                    public static {{structName}} Parse(string? s, IFormatProvider? provider = null)
-                    {
-                        if (!TryParse(s, provider, out var result) && !result.IsValid)
-                        {
-                            throw new FormatException("String is not a valid {{structName}}.");
-                        }
-                        
-                        return result;
-                    }
-                    
-                    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out {{structName}} result)
-                    {
-                        result = new {{structName}}(s);
-                        return result.IsValid;
-                    }
-                    
-                    public static bool TryParse(string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out {{structName}} result)
-                    {
-                        result = new {{structName}}(s);
-                        return result.IsValid;
-                    }
-                    
-                    #endregion
-                    
-                    #region equality
-                    
-                    public override int GetHashCode() => _value.GetHashCode();
-                    public bool Equals({{structName}} other) => _value.Span.SequenceEqual(other._value.Span);
-                    public override bool Equals(object? obj) => obj is {{structName}} other && Equals(other);
-                    public static bool operator ==({{structName}} left, {{structName}} right) => left.Equals(right);
-                    public static bool operator !=({{structName}} left, {{structName}} right) => !left.Equals(right);
-                    
-                    #endregion
-                    
-                    #region conversion
-                    
-                    /// <summary>
-                    /// Returns the underlying value as a string.
-                    /// </summary>
-                    public override string ToString() => _value.ToString();
-                    
-                    public static explicit operator string({{structName}} value) => value.ToString();
-                    public static explicit operator {{structName}}(string value) => new {{structName}}(value);
-                    public static implicit operator ReadOnlySpan<char>({{structName}} value) => value._value.Span;
-                    public static explicit operator {{structName}}(ReadOnlySpan<char> value) => new {{structName}}(value);
-                    
-                    #endregion
+                    throw new FormatException("String is not a valid {{structName}}.");
                 }
+                
+                return result;
             }
+            
+            public static {{structName}} Parse(string? s, IFormatProvider? provider = null)
+            {
+                if (!TryParse(s, provider, out var result) && !result.IsValid)
+                {
+                    throw new FormatException("String is not a valid {{structName}}.");
+                }
+                
+                return result;
+            }
+            
+            public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out {{structName}} result)
+            {
+                result = new {{structName}}(s);
+                return result.IsValid;
+            }
+            
+            public static bool TryParse(string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out {{structName}} result)
+            {
+                result = new {{structName}}(s);
+                return result.IsValid;
+            }
+            
+            #endregion
+            
+            #region equality
+            
+            public override int GetHashCode() => _value.GetHashCode();
+            public bool Equals({{structName}} other) => _value.Span.SequenceEqual(other._value.Span);
+            public override bool Equals(object? obj) => obj is {{structName}} other && Equals(other);
+            public static bool operator ==({{structName}} left, {{structName}} right) => left.Equals(right);
+            public static bool operator !=({{structName}} left, {{structName}} right) => !left.Equals(right);
+            
+            #endregion
+            
+            #region conversion
+            
+            /// <summary>
+            /// Returns the underlying value as a string.
+            /// </summary>
+            public override string ToString() => _value.ToString();
+            
+            public static explicit operator string({{structName}} value) => value.ToString();
+            public static explicit operator {{structName}}(string value) => new {{structName}}(value);
+            public static implicit operator ReadOnlySpan<char>({{structName}} value) => value._value.Span;
+            public static explicit operator {{structName}}(ReadOnlySpan<char> value) => new {{structName}}(value);
+            
+            #endregion
+        }
         """;
     }
 
-    private string AttributeSource(string className) =>
-        $$"""
-           using System;
-           using System.CodeDom.Compiler;
-           
-           #nullable enable
-           #pragma warning disable CS0436 // Type may be defined multiple times
-           namespace {{@namespace}};
-           /// <summary>
-           /// Classes decorated with this attribute will trigger code generation.
-           /// A partial part of the struct will be generated in the same namespace.
-           /// </summary>
-           [GeneratedCode("{{ToolName}}", "{{ToolVersion}}")]
-           [System.AttributeUsage(System.AttributeTargets.Struct, AllowMultiple = false)]
-           public class {{className}} : System.Attribute;
-                
-           """;
     
     private string InterfaceSource(string typeName) =>
         $$"""
            using System;
-           using System.CodeDom.Compiler;
            
            #nullable enable
            #pragma warning disable CS0436 // Type may be defined multiple times
-           namespace {{@namespace}};
+           namespace {{Ns}};
            /// <summary>
            /// This is a marker interface for generated value types
            /// </summary>
-           [GeneratedCode("{{ToolName}}", "{{ToolVersion}}")]
+           {{GeneratedCodeAttribute}}
            public interface {{typeName}}
            {
                 /// <summary>
@@ -281,18 +227,17 @@ internal class Generator(string @namespace)
     private string TypeConverterSource(string typeConverterName) =>
         $$"""
            using System;
-           using System.CodeDom.Compiler;
            using System.ComponentModel;
            using System.Diagnostics.CodeAnalysis;
            using System.Globalization;
            
            #nullable enable
            #pragma warning disable CS0436 // Type may be defined multiple times
-           namespace {{@namespace}};
+           namespace {{Ns}};
            /// <summary>
            /// This is a type converter for value types
            /// </summary>
-           [GeneratedCode("{{ToolName}}", "{{ToolVersion}}")]
+           {{GeneratedCodeAttribute}}
            public class {{typeConverterName}}<T> : TypeConverter where T: IParsable<T>
            {
                 public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType) => sourceType == typeof(string);
@@ -318,18 +263,17 @@ internal class Generator(string @namespace)
         $$"""
           using System;
           using System.Buffers;
-          using System.CodeDom.Compiler;
           using System.Text;
           using System.Text.Json;
           using System.Text.Json.Serialization;
           
           #nullable enable
           #pragma warning disable CS0436 // Type may be defined multiple times
-          namespace {{@namespace}};
+          namespace {{Ns}};
           /// <summary>
           /// This is a json converter for value types
           /// </summary>
-          [GeneratedCode("{{ToolName}}", "{{ToolVersion}}")]
+          {{GeneratedCodeAttribute}}
           public class {{jsonConverterName}}<T> : JsonConverter<T> where T : ISpanParsable<T>, {{InterfaceName}}
           {
               public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -377,16 +321,15 @@ internal class Generator(string @namespace)
     private string HelperSource(string helperName) =>
         $$"""
            using System;
-           using System.CodeDom.Compiler;
            using System.Text.RegularExpressions;
            
            #nullable enable
            #pragma warning disable CS0436 // Type may be defined multiple times
-           namespace {{@namespace}};
+           namespace {{Ns}};
            /// <summary>
            /// This is a helper class for value types
            /// </summary>
-           [GeneratedCode("{{ToolName}}", "{{ToolVersion}}")]
+           {{GeneratedCodeAttribute}}
            internal static class {{helperName}}
            {
                 /// <summary>

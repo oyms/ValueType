@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
-namespace Skaar.ValueType.Tests;
+namespace Skaar.ValueType.Tests.StringBased;
 
 public class GeneratorTests
 {
