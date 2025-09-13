@@ -31,6 +31,15 @@ public class GeneratorTests
         
         t0.Equals(t1).ShouldBeFalse();
         ((IEquatable<GeneratorTestsTargetTypeInt>) t1).Equals(t0).ShouldBeFalse();
+    }    
+    
+    [Fact]
+    public void ToString_ToString_ReturnsSameAsInnerValue()
+    {
+        var value = Guid.NewGuid();
+        GeneratorTestsTargetTypeGuid target = value;
+        
+        ((IFormattable)target).ToString("B", null).ShouldBe(value.ToString("B", null));
     }
 }
 

@@ -23,4 +23,16 @@ public abstract class InterfaceImplementor
             SymbolEqualityComparer.Default.Equals(x.TypeArguments[0], genericArgument)
         );
     }
+    protected bool TypeImplementsInterface(ITypeSymbol type, string @namespace, string interfaceName)
+    {
+        return type.AllInterfaces.Any(x =>
+            x.Name == interfaceName &&
+            x.ContainingNamespace.ToDisplayString() == @namespace
+        );
+    }
+    
+    protected string RenderInterfaceName(ITypeSymbol genericParameter)
+    {
+        return $"{Ns}.{InterfaceName}<{genericParameter.Name}>";
+    }
 }

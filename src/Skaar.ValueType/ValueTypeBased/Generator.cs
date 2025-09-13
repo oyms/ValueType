@@ -42,9 +42,12 @@ internal class Generator(string @namespace) : Common.Generator(@namespace)
         {
             foreach (var (structSymbol, valueType) in structSymbols.Where(s => s.Struct is not null))
             {
+                var targetSymbol = (ITypeSymbol)structSymbol;
                 InterfaceImplementor[] interfaces = [
-                    new EquatableGenerator((ITypeSymbol)structSymbol, valueType),
-                    new ComparableGenerator((ITypeSymbol)structSymbol, valueType)
+                    new EquatableGenerator(targetSymbol, valueType),
+                    new ComparableGenerator(targetSymbol, valueType),
+                    new ConvertibleGenerator(targetSymbol, valueType),
+                    new FormattableGenerator(targetSymbol, valueType)
                 ];
                 var typeName = structSymbol!.Name;
                 var ns = structSymbol.ContainingNamespace.ToDisplayString();
