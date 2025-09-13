@@ -11,11 +11,11 @@ namespace Skaar.ValueType;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class Analyzer : DiagnosticAnalyzer
 {
+    #pragma warning disable RS1032 
     private static readonly DiagnosticDescriptor InvalidVisibility = new(
         id: "VALUETYPE001",
         title: "Invalid Visibility",
-        messageFormat:
-        $"Structs decorated with the [{StringBased.Generator.AttributeName}] attribute must be public or internal.",
+        messageFormat: $"Structs decorated with the [{Common.Generator.AttributeName}] attribute must be public or internal.",
         category: "Usage",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);    
@@ -24,7 +24,7 @@ public class Analyzer : DiagnosticAnalyzer
         id: "VALUETYPE002",
         title: "Nested type",
         messageFormat:
-        $"Structs decorated with the [{StringBased.Generator.AttributeName}] cannot be nested in another type.",
+        $"Structs decorated with the [{Common.Generator.AttributeName}] cannot be nested in another type.",
         category: "Usage",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);   
@@ -33,7 +33,7 @@ public class Analyzer : DiagnosticAnalyzer
         id: "VALUETYPE003",
         title: "Not partial",
         messageFormat:
-        $"Structs decorated with the [{StringBased.Generator.AttributeName}] must be partial.",
+        $"Structs decorated with the [{Common.Generator.AttributeName}] must be partial.",
         category: "Usage",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);    
@@ -42,7 +42,7 @@ public class Analyzer : DiagnosticAnalyzer
         id: "VALUETYPE004",
         title: "Record struct",
         messageFormat:
-        $"Record structs decorated with the [{StringBased.Generator.AttributeName}] are not supported.",
+        $"Record structs decorated with the [{Common.Generator.AttributeName}] are not supported.",
         category: "Usage",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
@@ -122,7 +122,7 @@ public class Analyzer : DiagnosticAnalyzer
 
             var hasAttribute = symbol.GetAttributes()
                 .Any(attr => attr.AttributeClass?.ToDisplayString() ==
-                             $"{Generator.AttributeNamespace}.{StringBased.Generator.AttributeName}");
+                             $"{Generator.AttributeNamespace}.{Common.Generator.AttributeName}");
             if (!hasAttribute)
                 return;
             action.Invoke(ctx, symbol, typeDeclaration);

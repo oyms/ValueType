@@ -49,14 +49,15 @@ internal class Generator(string @namespace) : Common.Generator(@namespace)
                     new ComparableGenerator(targetSymbol, valueType),
                     new ConvertibleGenerator(targetSymbol, valueType),
                     new FormattableGenerator(targetSymbol, valueType),
-                    new ParsableGenerator(targetSymbol, valueType)
+                    new ParsableGenerator(targetSymbol, valueType),
+                    new EqualityOperatorsGenerator(targetSymbol, valueType)
                 ];
                 var typeName = structSymbol!.Name;
                 var ns = structSymbol.ContainingNamespace.ToDisplayString();
-                var hasConstructorDefined = HasConstructorDefined(structSymbol as INamedTypeSymbol, valueType);
+                var hasConstructorDefined = HasConstructorDefined(structSymbol as INamedTypeSymbol, valueType!);
                 productionContext.AddSource($"{ns}.{typeName}.g.cs",
                     SourceText.From(
-                        StructSource(ns, typeName, valueType.ToDisplayString(), !hasConstructorDefined, interfaces),
+                        StructSource(ns, typeName, valueType!.ToDisplayString(), !hasConstructorDefined, interfaces),
                         Encoding.UTF8));
             }
         });
@@ -132,6 +133,7 @@ internal class Generator(string @namespace) : Common.Generator(@namespace)
                     
                     public override string ToString() => _value.ToString();
                     public override int GetHashCode() => _value.GetHashCode();
+                    public override bool Equals(object? obj) => obj is {{structName}} other && _value.Equals(other._value);
                     
                     bool {{valueTypeInterfaceName}}.HasValue => !Equals(_value, default);
                     {{valueType}} {{Ns}}.{{BaseInterfaceName}}<{{valueType}}>.Value => _value;
