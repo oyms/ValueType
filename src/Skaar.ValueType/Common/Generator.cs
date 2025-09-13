@@ -52,25 +52,4 @@ internal class Generator(string @namespace)
     protected string GeneratedCodeAttribute =>
         $"[System.CodeDom.Compiler.GeneratedCode(\"{ToolName}\", \"{ToolVersion}\")]";
     
-    protected bool HasConstructorDefined(INamedTypeSymbol? symbol)
-    {
-        if(symbol is null) return false;
-        return symbol.InstanceConstructors.Any(ctor => 
-        {
-            if(ctor.IsStatic) return false;
-            if (ctor.Parameters.Length != 1) return false;
-            var pType = ctor.Parameters[0].Type;
-            if (pType is INamedTypeSymbol named &&
-                named.IsGenericType &&
-                named.Name == nameof(ReadOnlySpan<char>) &&
-                named.ContainingNamespace.ToDisplayString() == "System" &&
-                named.TypeArguments.Length == 1 &&
-                named.TypeArguments[0].SpecialType == SpecialType.System_Char)
-            {
-                return true;
-            }
-            return false;
-
-        });
-    }
 }

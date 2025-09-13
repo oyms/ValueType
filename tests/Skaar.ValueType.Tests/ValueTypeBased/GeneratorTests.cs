@@ -11,19 +11,31 @@ public class GeneratorTests
         const int innerValue = 72;
         var target = (GeneratorTestsTargetTypeInt)innerValue;
         target.ToString().ShouldBe(innerValue.ToString());
+    }    
+    
+    [Fact]
+    public void Equals_SameInnerValue_ReturnsTrue()
+    {
+        GeneratorTestsTargetTypeInt t0 = 10;
+        GeneratorTestsTargetTypeInt t1 = 10;
+        
+        t0.Equals(t1).ShouldBeTrue();
+        ((IEquatable<GeneratorTestsTargetTypeInt>) t1).Equals(t0).ShouldBeTrue();
+    }  
+    
+    [Fact]
+    public void Equals_DifferentInnerValue_ReturnsFalse()
+    {
+        GeneratorTestsTargetTypeInt t0 = 100;
+        GeneratorTestsTargetTypeInt t1 = 17;
+        
+        t0.Equals(t1).ShouldBeFalse();
+        ((IEquatable<GeneratorTestsTargetTypeInt>) t1).Equals(t0).ShouldBeFalse();
     }
 }
 
 [ValueType<int>]
 public partial struct GeneratorTestsTargetTypeInt;
 
-[System.Diagnostics.DebuggerDisplay("{_innerValue}")]
-file struct Kladd
-{
-    [System.Diagnostics.DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private readonly int _innerValue;
-    public Kladd(int innerValue) => _innerValue = innerValue;
-    
-    public static implicit operator Kladd(int innerValue) => new(innerValue);
-
-}
+[ValueType<Guid>]
+public partial struct GeneratorTestsTargetTypeGuid;

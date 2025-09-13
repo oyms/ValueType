@@ -23,6 +23,7 @@ public class Generator : IIncrementalGenerator
         stringBasedSource.GenerateStructFiles(context);
 
         var valueBasedSource = new ValueTypeBased.Generator(AttributeNamespace);
+        valueBasedSource.GenerateInterface(context);
         valueBasedSource.GenerateStructFiles(context);
     }
 }
