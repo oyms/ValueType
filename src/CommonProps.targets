@@ -7,7 +7,7 @@
         <Product>ValueType</Product>
         <Authors>Skaar</Authors>
         <Description>A code generator to generate value types.</Description>
-        <PackageTags>Patterns;Model;JSON;valuetype;wrapper;types;comnversion</PackageTags>
+        <PackageTags>Patterns;Model;JSON;valuetype;wrapper;types;conversion</PackageTags>
         <IncludeSymbols>true</IncludeSymbols>
         <IncludeSource>false</IncludeSource>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
