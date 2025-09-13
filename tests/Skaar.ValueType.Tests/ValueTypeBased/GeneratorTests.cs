@@ -1,5 +1,4 @@
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using Shouldly;
 
 namespace Skaar.ValueType.Tests.ValueTypeBased;
@@ -50,6 +49,24 @@ public class GeneratorTests
         var result = GeneratorTestsTargetTypeGuid.Parse(value.ToString("B", null));
         result.ShouldBe(value);
     }
+
+    [Fact]
+    public void JsonConversion_Roundtrip_ReturnsSameValue()
+    {
+        var target = new JsonTestTarget(
+            255,
+            Guid.NewGuid(),
+            true,
+            DateTimeOffset.Now,
+            123.456m,
+            789.0123456f
+        );
+        
+        var json = JsonSerializer.Serialize(target);
+        var result = JsonSerializer.Deserialize<JsonTestTarget>(json);
+        
+        result.ShouldBe(target);
+    }
 }
 
 [ValueType<int>]
@@ -57,3 +74,22 @@ public partial struct GeneratorTestsTargetTypeInt;
 
 [ValueType<Guid>]
 public partial struct GeneratorTestsTargetTypeGuid;
+
+[ValueType<bool>]
+public partial struct GeneratorTestsTargetTypeBool;
+
+[ValueType<DateTimeOffset>]
+public partial struct GeneratorTestsTargetTypeDate;
+[ValueType<decimal>]
+public partial struct GeneratorTestsTargetTypeDecimal;
+[ValueType<float>]
+public partial struct GeneratorTestsTargetTypeFloat;
+
+file record JsonTestTarget(
+    GeneratorTestsTargetTypeInt IntType,
+    GeneratorTestsTargetTypeGuid GuidType,
+    GeneratorTestsTargetTypeBool BoolType,
+    GeneratorTestsTargetTypeDate DateType,
+    GeneratorTestsTargetTypeDecimal DecimalType,
+    GeneratorTestsTargetTypeFloat FloatType
+    );

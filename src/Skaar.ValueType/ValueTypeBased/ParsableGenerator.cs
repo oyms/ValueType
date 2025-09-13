@@ -23,11 +23,12 @@ public class ParsableGenerator(ITypeSymbol type, ITypeSymbol genericType) : Inte
         return $$"""
                      
                      ///<inheritdoc/>
-                     public static {{type.ToDisplayString()}} Parse(string s, System.IFormatProvider? provider = null) => new({{genericType.ToDisplayString()}}.Parse(s, provider));
+                     public static {{type.ToDisplayString()}} Parse(string s, System.IFormatProvider? provider = null) => new(_parseValue<{{genericType.ToDisplayString()}}>(s, provider));
+                     private static T _parseValue<T>(string s, System.IFormatProvider? provider = null) where T : IParsable<T> => T.Parse(s, provider);
                      ///<inheritdoc/>
                      public static bool TryParse(string? s, System.IFormatProvider? provider, out {{type.ToDisplayString()}} result)
                      {
-                        if({{genericType.ToDisplayString()}}.TryParse(s, provider, out var value))
+                        if(_tryParseValue<{{genericType.ToDisplayString()}}>(s, provider, out var value))
                         {
                             result = new(value);
                             return true;
@@ -38,6 +39,7 @@ public class ParsableGenerator(ITypeSymbol type, ITypeSymbol genericType) : Inte
                             return false;
                         }
                      }
+                     private static bool _tryParseValue<T>(string? s, System.IFormatProvider? provider, out T result) where T : IParsable<T> => T.TryParse(s, provider, out result);
                  """;
     }
 }

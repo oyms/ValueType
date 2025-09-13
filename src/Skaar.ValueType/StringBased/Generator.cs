@@ -69,7 +69,7 @@ internal class Generator(string @namespace) : Common.Generator(@namespace)
         });        
         context.RegisterPostInitializationOutput(ctx =>
         {
-            ctx.AddSource($"JsonConverter.g.cs", SourceText.From(JsonConverterSource(JsonConverterName), Encoding.UTF8));
+            ctx.AddSource($"ParsableJsonConverter.g.cs", SourceText.From(JsonConverterSource(JsonConverterName), Encoding.UTF8));
         });
     }
 

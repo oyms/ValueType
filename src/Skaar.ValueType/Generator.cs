@@ -1,10 +1,4 @@
-using System;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
 
 namespace Skaar.ValueType;
 
@@ -25,6 +19,7 @@ public class Generator : IIncrementalGenerator
 
         var valueBasedSource = new ValueTypeBased.Generator(AttributeNamespace);
         valueBasedSource.GenerateInterface(context);
+        valueBasedSource.GenerateConverters(context);
         valueBasedSource.GenerateStructFiles(context);
     }
 }
