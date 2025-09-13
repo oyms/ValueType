@@ -42,8 +42,10 @@ internal class Generator(string @namespace) : Common.Generator(@namespace)
         {
             foreach (var (structSymbol, valueType) in structSymbols.Where(s => s.Struct is not null))
             {
-                var interfaces = new InterfaceImplementor[]
-                    { new EquatableGenerator((INamedTypeSymbol)structSymbol, valueType) };
+                InterfaceImplementor[] interfaces = [
+                    new EquatableGenerator((ITypeSymbol)structSymbol, valueType),
+                    new ComparableGenerator((ITypeSymbol)structSymbol, valueType)
+                ];
                 var typeName = structSymbol!.Name;
                 var ns = structSymbol.ContainingNamespace.ToDisplayString();
                 var hasConstructorDefined = HasConstructorDefined(structSymbol as INamedTypeSymbol, valueType);
