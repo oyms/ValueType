@@ -2,8 +2,11 @@ using Microsoft.CodeAnalysis;
 
 namespace Skaar.ValueType.ValueTypeBased;
 
-public class EquatableGenerator(ITypeSymbol type, ITypeSymbol genericType) : InterfaceImplementor
+public class ComparableGenerator(ITypeSymbol type, ITypeSymbol genericType) : InterfaceImplementor
 {
+    protected override string InterfaceName => "IComparable";
+    protected override string Ns => "System";
+
     public override string RenderInterfaceName()
     {
         return $"{Ns}.{InterfaceName}<{type.Name}>";
@@ -15,15 +18,12 @@ public class EquatableGenerator(ITypeSymbol type, ITypeSymbol genericType) : Int
     protected override bool WrapperTypeImplementsInterface() =>
         TypeImplementsGenericInterface(type, Ns, InterfaceName, type);
 
-    protected override string InterfaceName => "IEquatable";
-    protected override string Ns => "System";
-
     public override string Render()
     {
         return $$"""
                      
                      ///<inheritdoc/>
-                     bool {{RenderInterfaceName()}}.Equals({{type.ToDisplayString()}} other) => _value.Equals(other._value);
+                     int {{RenderInterfaceName()}}.CompareTo({{type.Name}} other) => (({{RenderInterfaceName(genericType)}})_value).CompareTo(other._value);
                  """;
     }
 }

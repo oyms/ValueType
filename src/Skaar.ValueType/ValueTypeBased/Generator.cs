@@ -47,7 +47,8 @@ internal class Generator(string @namespace) : Common.Generator(@namespace)
                     new EquatableGenerator(targetSymbol, valueType),
                     new ComparableGenerator(targetSymbol, valueType),
                     new ConvertibleGenerator(targetSymbol, valueType),
-                    new FormattableGenerator(targetSymbol, valueType)
+                    new FormattableGenerator(targetSymbol, valueType),
+                    new ParsableGenerator(targetSymbol, valueType)
                 ];
                 var typeName = structSymbol!.Name;
                 var ns = structSymbol.ContainingNamespace.ToDisplayString();

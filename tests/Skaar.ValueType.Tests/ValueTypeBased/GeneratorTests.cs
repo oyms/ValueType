@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Shouldly;
 
 namespace Skaar.ValueType.Tests.ValueTypeBased;
@@ -40,6 +41,14 @@ public class GeneratorTests
         GeneratorTestsTargetTypeGuid target = value;
         
         ((IFormattable)target).ToString("B", null).ShouldBe(value.ToString("B", null));
+    }
+
+    [Fact]
+    public void Parse_Parse_ReturnsSameAsInnerValue()
+    {
+        var value = Guid.NewGuid();
+        var result = GeneratorTestsTargetTypeGuid.Parse(value.ToString("B", null));
+        result.ShouldBe(value);
     }
 }
 
