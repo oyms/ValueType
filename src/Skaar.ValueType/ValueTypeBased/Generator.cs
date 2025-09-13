@@ -121,7 +121,7 @@ internal class Generator(string @namespace) : Common.Generator(@namespace)
                     public override int GetHashCode() => _value.GetHashCode();
                     
                     bool {{valueTypeInterfaceName}}.HasValue => !Equals(_value, default);
-                    {{valueType}} {{valueTypeInterfaceName}}.Value => _value;
+                    {{valueType}} {{Ns}}.{{BaseInterfaceName}}<{{valueType}}>.Value => _value;
                     
                     {{interfaceImplementations}}
                  }
@@ -138,16 +138,12 @@ internal class Generator(string @namespace) : Common.Generator(@namespace)
           /// This is a marker interface for struct based value types
           /// </summary>
           {{GeneratedCodeAttribute}}
-          public interface {{typeName}}<T> where T: struct
+          public interface {{typeName}}<T> : {{BaseInterfaceName}}<T> where T: struct
           {
                /// <summary>
                /// <c>true</c> if the value is different from default, <c>false</c> otherwise.
                /// </summary>
                bool HasValue { get; }
-               /// <summary>
-               /// The inner value.
-               /// </summary>
-               T Value { get; }
           }
                
           """;

@@ -214,6 +214,12 @@ internal class Generator(string @namespace) : Common.Generator(@namespace)
             public static explicit operator {{structName}}(ReadOnlySpan<char> value) => new {{structName}}(value);
             
             #endregion
+            
+            #region Base interface
+            
+            string {{Ns}}.{{BaseInterfaceName}}<string>.Value => _value.ToString();
+            
+            #endregion
         }
         """;
     }
@@ -230,7 +236,7 @@ internal class Generator(string @namespace) : Common.Generator(@namespace)
            /// This is a marker interface for generated value types
            /// </summary>
            {{GeneratedCodeAttribute}}
-           public interface {{typeName}}
+           public interface {{typeName}} : {{Ns}}.{{BaseInterfaceName}}<string>
            {
                 /// <summary>
                 /// <c>true</c> if the value is valid, <c>false</c> otherwise.

@@ -17,6 +17,7 @@ public class Generator : IIncrementalGenerator
     {
         var stringBasedSource = new StringBased.Generator(AttributeNamespace);
         stringBasedSource.GenerateAttributeFiles(context);
+        stringBasedSource.GenerateCommonInterface(context);
         stringBasedSource.GenerateInterface(context);
         stringBasedSource.GenerateConverters(context);
         stringBasedSource.GenerateHelper(context);

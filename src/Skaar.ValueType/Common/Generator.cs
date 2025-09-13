@@ -11,6 +11,7 @@ internal class Generator(string @namespace)
 {
     protected string Ns { get; } = @namespace;
     public const string AttributeName = "ValueTypeAttribute";
+    public const string BaseInterfaceName = "IValueType";
     string ToolName => Assembly.GetExecutingAssembly().GetName().Name;
     Version ToolVersion => Assembly.GetExecutingAssembly().GetName().Version;
 
@@ -21,6 +22,15 @@ internal class Generator(string @namespace)
             ctx.AddSource($"{AttributeName}.g.cs", SourceText.From(AttributeSource(AttributeName), Encoding.UTF8));
         });
     }
+    
+    public void GenerateCommonInterface(IncrementalGeneratorInitializationContext context)
+    {
+        context.RegisterPostInitializationOutput(ctx =>
+        {
+            ctx.AddSource($"{BaseInterfaceName}.g.cs", SourceText.From(InterfaceSource(BaseInterfaceName), Encoding.UTF8));
+        });
+    }  
+    
     private string AttributeSource(string className) =>
         $$"""
            using System;
@@ -49,6 +59,27 @@ internal class Generator(string @namespace)
                 
            """;
 
+    private string InterfaceSource(string typeName) =>
+        $$"""
+          using System;
+
+          #nullable enable
+          #pragma warning disable CS0436 // Type may be defined multiple times
+          namespace {{Ns}};
+          /// <summary>
+          /// This is a marker interface for generated value types
+          /// </summary>
+          {{GeneratedCodeAttribute}}
+          public interface {{BaseInterfaceName}}<T>
+          {
+               /// <summary>
+               /// The inner value
+               /// </summary>
+               T Value { get; }
+          }
+               
+          """;
+    
     protected string GeneratedCodeAttribute =>
         $"[System.CodeDom.Compiler.GeneratedCode(\"{ToolName}\", \"{ToolVersion}\")]";
     
