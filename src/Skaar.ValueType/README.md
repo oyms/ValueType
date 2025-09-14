@@ -7,13 +7,8 @@ When you want strong types for your value objects or identifiers, this library c
 
 ```csharp
 [ValueType]
-public partial struct MyValueType
-{
-    private partial ReadOnlySpan<char> Clean(ReadOnlySpan<char> value) => Helper.Clean.Trim(value);
-    private partial bool ValueIsValid(ReadOnlySpan<char> value) => Helper.Validate.Default(value);
-}
-```
-```csharp
+public partial struct MyValueTypeWrappingStrings;
+
 [ValueType<Guid>]
 public partial struct MyValueTypeWrappingGuids;
 

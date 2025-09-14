@@ -3,13 +3,12 @@ Value type
 
 <img alt="icon" style="width: 200px;" src="./resources/logo.svg" />
 
+> [!TIP]
+> A simple way to generate value types to get strong typing of values and identifiers in your model.
+
 ```csharp
 [ValueType]
-public partial struct MyValueType
-{
-    private partial ReadOnlySpan<char> Clean(ReadOnlySpan<char> value) => Helper.Clean.Trim(value);
-    private partial bool ValueIsValid(ReadOnlySpan<char> value) => Helper.Validate.Default(value);
-}
+public partial struct MyValueType;
 
 [ValueType<Guid>]
 public partial struct MyGuidBasedValueType;
@@ -18,7 +17,7 @@ public partial struct MyGuidBasedValueType;
 Code generation to generate structs wrapping internal values.
 This avoids writing boilerplate code when you want strong typing of values and identities.
 
-There are two variants; _string based_ and _struct based_
+There are two variants; _string based_ and _struct based_.
 
 >[!NOTE]
 > **Decorate a partial struct with the `ValueType` attribute.**
@@ -84,8 +83,9 @@ var intValue = (int) value;
 Create partial structs. Decorate with the `ValueType` attribute.
 Implement partial methods to clean and validate the value.
 
-`record struct` is not supported.
-It cannot be a nested type.
+> [!IMPORTANT]
+> `record struct` is not supported.
+> It also cannot be a nested type.
 
 The structs are optimized for memory usage and performance.
 They implement `IEquatable<T>`, `IEqualityOperators<T,T,bool>` and `ISpanParsable<T>` interfaces.
@@ -99,22 +99,26 @@ Convert the other way using `ToString()` method or conversion.
 #### Clean
 
 ```csharp
-private partial ReadOnlySpan<char> Clean(ReadOnlySpan<char> value);
+private ReadOnlySpan<char> Clean(ReadOnlySpan<char> value);
 ```
 
 This method is called when parsing/creating the value.
 It can be implemented with a helper method from `Skaar.ValueType.Helper.Clean` class.
 
+> [!NOTE] When not defined, a default implementation is used. It will trim the value.
+
 #### Validate
 
 ```csharp
-private partial bool ValueIsValid(ReadOnlySpan<char> value);
+private bool ValueIsValid(ReadOnlySpan<char> value);
 ``` 
 
 This method is called to validate the value.
 It is called from the `IsValid` property and is used in parsing methods.
 
 It can be implemented with a helper method from `Skaar.ValueType.Helper.Validate` class.
+
+> [!NOTE] When not defined, a default implementation is used. It will return false if the value is empty.
 
 #### Example
 
@@ -125,8 +129,8 @@ using Skaar.ValueType;
 [ValueType]
 public partial struct MyValueType
 {
-    private partial ReadOnlySpan<char> Clean(ReadOnlySpan<char> value) => Helper.Clean.RemoveNonDigits(value);
-    private partial bool ValueIsValid(ReadOnlySpan<char> value) => Helper.Validate.IsMatch(value, new Regex(@"^\d{3}$"));
+    private ReadOnlySpan<char> Clean(ReadOnlySpan<char> value) => Helper.Clean.RemoveNonDigits(value);
+    private bool ValueIsValid(ReadOnlySpan<char> value) => Helper.Validate.IsMatch(value, new Regex(@"^\d{3}$"));
 } 
 
 var value = MyValueType.Parse("123a");
@@ -143,21 +147,19 @@ If a custom constructor is required (for instance, to set other properties),
 this can be defined, and the partial generated part will omit the constructor.
 
 The constructor must have the same signature as the generated one:
-
-`GeneratorTestsTargetType2(ReadOnlySpan<char> value)`, and it should set 
+`MyValueType(ReadOnlySpan<char> value)`, and it should set 
 the field `_value`. It can be private or public.
 
 ```C#
 [ValueType]
-public partial struct GeneratorTestsTargetType2
+[StructLayout(LayoutKind.Auto)]
+public partial struct MyValueType
 {
-    private GeneratorTestsTargetType2(ReadOnlySpan<char> value)
+    private MyValueType(ReadOnlySpan<char> value)
     {
         _value = Clean(value).ToArray();
         WasSetInCtor = true;
     }
-    private partial ReadOnlySpan<char> Clean(ReadOnlySpan<char> value) => Helper.Clean.Trim(value);
-    private partial bool ValueIsValid(ReadOnlySpan<char> value) => Helper.Validate.Default(value);
     public bool WasSetInCtor { get; }
 }
 ```

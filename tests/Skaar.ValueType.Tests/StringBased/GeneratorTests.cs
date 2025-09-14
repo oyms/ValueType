@@ -55,20 +55,33 @@ public class GeneratorTests
         var x = GeneratorTestsTargetType2.Parse("Hello World");
         Assert.True(x.WasSetInCtor);
     }
+
+    [Fact]
+    public void DefaultCleanAndValid_WhenMethodsAreNotDefined_TrimsWhitespace()
+    {
+        const string expected = "Hello World";
+        var targetValid = GeneratorTestsTargetType3.Parse($"\t\r {expected} \n");
+        GeneratorTestsTargetType3 targetInvalid = default;
+
+        Assert.True(targetValid.IsValid);
+        Assert.Equal(expected, targetValid.ToString());
+        Assert.False(targetInvalid.IsValid);
+        Assert.Empty(targetInvalid.ToString());
+    }
 }
 
 [ValueType]
 public partial struct GeneratorTestsTargetType0
 {
-    private partial ReadOnlySpan<char> Clean(ReadOnlySpan<char> value) => Helper.Clean.Trim(value);
-    private partial bool ValueIsValid(ReadOnlySpan<char> value) => Helper.Validate.Default(value);
+    private ReadOnlySpan<char> Clean(ReadOnlySpan<char> value) => Helper.Clean.Trim(value);
+    private bool ValueIsValid(ReadOnlySpan<char> value) => Helper.Validate.Default(value);
 }
 
 [ValueType]
 public partial struct GeneratorTestsTargetType1
 {
-    private partial ReadOnlySpan<char> Clean(ReadOnlySpan<char> value) => Helper.Clean.Filter(value, c => !char.IsLetter(c));
-    private partial bool ValueIsValid(ReadOnlySpan<char> value) => Helper.Validate.IsMatch(value, MyRegex());
+    private static ReadOnlySpan<char> Clean(ReadOnlySpan<char> value) => Helper.Clean.Filter(value, c => !char.IsLetter(c));
+    private static bool ValueIsValid(ReadOnlySpan<char> value) => Helper.Validate.IsMatch(value, MyRegex());
     [GeneratedRegex(@"^\d{3}-\d{2}-\d{4}$")]
     private static partial Regex MyRegex();
 }
@@ -82,8 +95,11 @@ public partial struct GeneratorTestsTargetType2
         _value = Clean(value).ToArray();
         WasSetInCtor = true;
     }
-    private partial ReadOnlySpan<char> Clean(ReadOnlySpan<char> value) => Helper.Clean.Trim(value);
-    private partial bool ValueIsValid(ReadOnlySpan<char> value) => Helper.Validate.Default(value);
+    private ReadOnlySpan<char> Clean(ReadOnlySpan<char> value) => Helper.Clean.Trim(value);
+    private bool ValueIsValid(ReadOnlySpan<char> value) => Helper.Validate.Default(value);
     public bool WasSetInCtor { get; }
 }
+
+[ValueType]
+public partial struct GeneratorTestsTargetType3;
 
