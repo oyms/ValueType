@@ -19,7 +19,7 @@ This avoids writing boilerplate code when you want strong typing of values and i
 
 There are two variants; _string based_ and _struct based_.
 
->[!NOTE]
+> [!NOTE]
 > **Decorate a partial struct with the `ValueType` attribute.**
 > The struct must be public or internal and cannot be a nested type. 
 > `record struct` is not supported.
@@ -105,7 +105,8 @@ private ReadOnlySpan<char> Clean(ReadOnlySpan<char> value);
 This method is called when parsing/creating the value.
 It can be implemented with a helper method from `Skaar.ValueType.Helper.Clean` class.
 
-> [!NOTE] When not defined, a default implementation is used. It will trim the value.
+> [!NOTE] 
+> When not defined, a default implementation is used. It will trim the value.
 
 #### Validate
 
@@ -118,7 +119,8 @@ It is called from the `IsValid` property and is used in parsing methods.
 
 It can be implemented with a helper method from `Skaar.ValueType.Helper.Validate` class.
 
-> [!NOTE] When not defined, a default implementation is used. It will return false if the value is empty.
+> [!NOTE] 
+> When not defined, a default implementation is used. It will return false if the value is empty.
 
 #### Example
 
