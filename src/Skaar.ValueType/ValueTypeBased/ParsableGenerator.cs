@@ -39,7 +39,7 @@ public class ParsableGenerator(ITypeSymbol type, ITypeSymbol genericType) : Inte
                             return false;
                         }
                      }
-                     private static bool _tryParseValue<T>(string? s, System.IFormatProvider? provider, out T result) where T : IParsable<T> => T.TryParse(s, provider, out result);
+                     private static bool _tryParseValue<T>(string? s, System.IFormatProvider? provider, out T result) where T : struct, IParsable<T> => T.TryParse(s, provider, out result);
                  """;
     }
 }

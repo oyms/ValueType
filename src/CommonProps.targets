@@ -3,7 +3,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>$(NoWarn);CS1591;CA1822</NoWarn>
         <AssemblyVersion>$(Version)</AssemblyVersion>
-        <VersionPrefix>2.0.0</VersionPrefix>
+        <VersionPrefix>2.0.1</VersionPrefix>
         <Product>ValueType</Product>
         <Authors>Skaar</Authors>
         <Description>A code generator to generate value types.</Description>
@@ -21,6 +21,7 @@
             1.0.0: Initial.
             1.1.0: Custom constructor
             2.0.0: Struct based value types
+            2.0.1: Remove some warnings
         </PackageReleaseNotes>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <IsPackable>true</IsPackable>

@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -52,7 +51,7 @@ internal class Generator(string @namespace) : Common.Generator(@namespace)
                     new ParsableGenerator(targetSymbol, valueType),
                     new EqualityOperatorsGenerator(targetSymbol, valueType)
                 ];
-                var typeName = structSymbol!.Name;
+                var typeName = structSymbol.Name;
                 var ns = structSymbol.ContainingNamespace.ToDisplayString();
                 var hasConstructorDefined = HasConstructorDefined(structSymbol as INamedTypeSymbol, valueType!);
                 productionContext.AddSource($"{ns}.{typeName}.g.cs",
@@ -182,7 +181,7 @@ internal class Generator(string @namespace) : Common.Generator(@namespace)
           /// This is a json converter for value types
           /// </summary>
           {{GeneratedCodeAttribute}}
-          public class {{jsonConverterName}}<T, TT> : JsonConverter<T> where T : {{InterfaceName}}<TT> where TT: struct
+          public class {{jsonConverterName}}<T, TT> : JsonConverter<T> where T : struct, {{InterfaceName}}<TT> where TT: struct
           {
               public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
               {

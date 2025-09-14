@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -27,7 +26,7 @@ internal class Generator(string @namespace)
     {
         context.RegisterPostInitializationOutput(ctx =>
         {
-            ctx.AddSource($"{BaseInterfaceName}.g.cs", SourceText.From(InterfaceSource(BaseInterfaceName), Encoding.UTF8));
+            ctx.AddSource($"{BaseInterfaceName}.g.cs", SourceText.From(InterfaceSource(), Encoding.UTF8));
         });
     }  
     
@@ -59,7 +58,7 @@ internal class Generator(string @namespace)
                 
            """;
 
-    private string InterfaceSource(string typeName) =>
+    private string InterfaceSource() =>
         $$"""
           using System;
 

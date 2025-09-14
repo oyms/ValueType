@@ -247,7 +247,7 @@ internal class Generator(string @namespace) : Common.Generator(@namespace)
                 /// </summary>
                 int Length { get; }
                 /// <summary>
-                /// The value as a <see cref="ReadOnlySpan{char}"/>.
+                /// The value as a <c>ReadOnlySpan{char}</c>.
                 /// </summary>
                 ReadOnlySpan<char> Span { get; }
            }

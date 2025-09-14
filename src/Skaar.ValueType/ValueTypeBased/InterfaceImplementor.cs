@@ -34,7 +34,7 @@ public abstract class InterfaceImplementor
             x.ContainingNamespace.ToDisplayString() == @namespace &&
             x.IsGenericType &&
             x.TypeArguments.Length == genericArguments.Length &&
-            x.TypeArguments.Zip(genericArguments, (a, b) => SymbolEqualityComparer.Default.Equals(a, b)).All(x => x)
+            x.TypeArguments.Zip(genericArguments, (a, b) => SymbolEqualityComparer.Default.Equals(a, b)).All(b => b)
         );
     }
     protected bool TypeImplementsInterface(ITypeSymbol type, string @namespace, string interfaceName)

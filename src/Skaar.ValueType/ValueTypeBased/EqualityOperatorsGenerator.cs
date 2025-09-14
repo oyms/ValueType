@@ -15,15 +15,15 @@ public class EqualityOperatorsGenerator(ITypeSymbol type, ITypeSymbol genericTyp
     protected override bool GenericArgumentTypeImplementsInterface() => ImplementsInterface(genericType);
     protected override bool WrapperTypeImplementsInterface() => ImplementsInterface(type);
     
-    private bool ImplementsInterface(ITypeSymbol type)
+    private bool ImplementsInterface(ITypeSymbol targetType)
     {
-        return type.AllInterfaces.Any(x =>
+        return targetType.AllInterfaces.Any(x =>
             x.Name == InterfaceName &&
             x.ContainingNamespace.ToDisplayString() == Ns &&
             x.IsGenericType &&
             x.TypeArguments.Length == 3 &&
-            SymbolEqualityComparer.Default.Equals(x.TypeArguments[0], type) &&
-            SymbolEqualityComparer.Default.Equals(x.TypeArguments[1], type) &&
+            SymbolEqualityComparer.Default.Equals(x.TypeArguments[0], targetType) &&
+            SymbolEqualityComparer.Default.Equals(x.TypeArguments[1], targetType) &&
             x.TypeArguments[2].SpecialType == SpecialType.System_Boolean
         );
     }

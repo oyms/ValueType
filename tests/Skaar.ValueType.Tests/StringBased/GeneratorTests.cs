@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -73,6 +74,7 @@ public partial struct GeneratorTestsTargetType1
 }
 
 [ValueType]
+[StructLayout(LayoutKind.Auto)]
 public partial struct GeneratorTestsTargetType2
 {
     private GeneratorTestsTargetType2(ReadOnlySpan<char> value)
