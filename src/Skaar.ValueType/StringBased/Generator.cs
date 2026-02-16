@@ -249,7 +249,12 @@ internal class Generator(string @namespace) : Common.Generator(@namespace)
             
             #region equality
             
-            public override int GetHashCode() => _value.GetHashCode();
+            public override int GetHashCode() {
+                var span = _value.Span;
+                var hc = new System.HashCode();
+                for (int i = 0; i < span.Length; i++) hc.Add(span[i]);
+                return hc.ToHashCode();
+            }
             public bool Equals({{setup.TypeName}} other) => _value.Span.SequenceEqual(other._value.Span);
             public override bool Equals(object? obj) => obj is {{setup.TypeName}} other && Equals(other);
             public static bool operator ==({{setup.TypeName}} left, {{setup.TypeName}} right) => left.Equals(right);

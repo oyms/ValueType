@@ -68,6 +68,14 @@ public class GeneratorTests
         Assert.False(targetInvalid.IsValid);
         Assert.Empty(targetInvalid.ToString());
     }
+    
+    [Fact]
+    public void GetHashCode_WithSameValue_ReturnsSameHashCode()
+    {
+        var x = GeneratorTestsTargetType0.Parse("Hello World");
+        var y = GeneratorTestsTargetType0.Parse("Hello World");
+        Assert.Equal(x.GetHashCode(), y.GetHashCode());
+    }
 }
 
 [ValueType]

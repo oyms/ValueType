@@ -77,6 +77,14 @@ public class GeneratorTests
         IFormattable target = (GeneratorTestsTargetTypeFloatWithFormattableImplementation)123.456f;
         target.ToString("E", null).ShouldBe("E");
     }
+
+    [Fact]
+    public void GetHashCode_WithSameValue_ReturnsSameHashCode()
+    {
+        var val1 =  (GeneratorTestsTargetTypeInt) 17;
+        var val2 =  (GeneratorTestsTargetTypeInt) 17;
+        val1.GetHashCode().ShouldBe(val2.GetHashCode());
+    }
 }
 
 [ValueType<int>]

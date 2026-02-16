@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/SolutionItems/">
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+    <File Path="resources/logo.png" />
+    <File Path="src/CommonProps.targets" />
+  </Folder>
+  <Project Path="src/Skaar.ValueType/Skaar.ValueType.csproj" />
+  <Project Path="tests/Skaar.ValueType.Tests/Skaar.ValueType.Tests.csproj" />
+</Solution>
