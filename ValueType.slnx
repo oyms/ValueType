@@ -5,6 +5,7 @@
     <File Path="resources/logo.png" />
     <File Path="src/CommonProps.targets" />
   </Folder>
+  <Project Path="src/Skaar.ValueType.Abstractions/Skaar.ValueType.Abstractions.csproj" />
   <Project Path="src/Skaar.ValueType/Skaar.ValueType.csproj" />
   <Project Path="tests/Skaar.ValueType.Tests/Skaar.ValueType.Tests.csproj" />
 </Solution>

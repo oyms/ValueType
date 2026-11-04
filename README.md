@@ -32,6 +32,20 @@ There are two variants; _string based_ and _struct based_.
 dotnet add package Skaar.ValueType
 ```
 
+The package contains the source generator and a small library, `Skaar.ValueType.Abstractions`,
+with the attributes, interfaces (`IValueType<T>`, `IStringBasedValueType`, `IStructBasedValueType<T>`),
+converters and `Helper` that the generated code uses. Because these types live in one shared assembly,
+several assemblies can use the generator and reference each other without type conflicts.
+
+> [!IMPORTANT]
+> If you build a library that exposes generated value types, **do not** reference the package with
+> `PrivateAssets="all"`. Consumers of your library need the abstractions library.
+> The default `PrivateAssets` (which excludes analyzers) is right: consumers get the library, not the generator.
+>
+> ```xml
+> <PackageReference Include="Skaar.ValueType" Version="4.0.0" />
+> ```
+
 ## Usage
 
 ### Struct based

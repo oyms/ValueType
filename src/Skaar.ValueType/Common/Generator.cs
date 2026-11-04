@@ -1,11 +1,13 @@
 using System;
 using System.Reflection;
-using System.Text;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
 
 namespace Skaar.ValueType.Common;
 
+/// <remarks>
+/// The attribute, interfaces, converters and helpers referenced by generated code
+/// live in the Skaar.ValueType.Abstractions assembly (namespace <see cref="Ns"/>),
+/// so every consuming assembly shares one definition of them.
+/// </remarks>
 internal class Generator(string @namespace)
 {
     protected string Ns { get; } = @namespace;
@@ -14,72 +16,7 @@ internal class Generator(string @namespace)
     string ToolName => Assembly.GetExecutingAssembly().GetName().Name;
     Version ToolVersion => Assembly.GetExecutingAssembly().GetName().Version;
 
-    public void GenerateAttributeFiles(IncrementalGeneratorInitializationContext context)
-    {
-        context.RegisterPostInitializationOutput(ctx =>
-        {
-            ctx.AddSource($"{AttributeName}.g.cs", SourceText.From(AttributeSource(AttributeName), Encoding.UTF8));
-        });
-    }
-    
-    public void GenerateCommonInterface(IncrementalGeneratorInitializationContext context)
-    {
-        context.RegisterPostInitializationOutput(ctx =>
-        {
-            ctx.AddSource($"{BaseInterfaceName}.g.cs", SourceText.From(InterfaceSource(), Encoding.UTF8));
-        });
-    }  
-    
-    private string AttributeSource(string className) =>
-        $$"""
-           using System;
-           
-           #nullable enable
-           #pragma warning disable CS0436 // Type may be defined multiple times
-           namespace {{Ns}};
-           /// <summary>
-           /// Classes decorated with this attribute will trigger code generation.
-           /// A partial part of the struct will be generated in the same namespace.
-           /// </summary>
-           {{GeneratedCodeAttribute}}
-           [System.AttributeUsage(System.AttributeTargets.Struct, AllowMultiple = false)]
-           public class {{className}} : System.Attribute;
-           
-           /// <summary>
-           /// Classes decorated with this attribute will trigger code generation.
-           /// A partial part of the struct will be generated in the same namespace.
-           /// </summary>
-           /// <typeparam name="T">The type of the inner value this type wraps.</typeparam>
-           {{GeneratedCodeAttribute}}
-           [System.AttributeUsage(System.AttributeTargets.Struct, AllowMultiple = false)]
-           public class {{className}}<T> : System.Attribute where T: struct;
-           
-           
-                
-           """;
-
-    private string InterfaceSource() =>
-        $$"""
-          using System;
-
-          #nullable enable
-          #pragma warning disable CS0436 // Type may be defined multiple times
-          namespace {{Ns}};
-          /// <summary>
-          /// This is a marker interface for generated value types
-          /// </summary>
-          {{GeneratedCodeAttribute}}
-          public interface {{BaseInterfaceName}}<T>
-          {
-               /// <summary>
-               /// The inner value
-               /// </summary>
-               T Value { get; }
-          }
-               
-          """;
-    
     protected string GeneratedCodeAttribute =>
         $"[System.CodeDom.Compiler.GeneratedCode(\"{ToolName}\", \"{ToolVersion}\")]";
-    
+
 }

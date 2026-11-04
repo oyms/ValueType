@@ -4,7 +4,7 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>latest</LangVersion>
         <OutputItemType>Analyzer</OutputItemType>
-        <InclydeBuildOutput>false</InclydeBuildOutput>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
         <IsRoslynAnalyzer>true</IsRoslynAnalyzer>
         <IsGenerator>true</IsGenerator>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
@@ -13,7 +13,7 @@
     
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" PrivateAssets="all" />
-        <PackageReference Update="Microsoft.SourceLink.GitHub" Version="10.0.103" />
+        <PackageReference Update="Microsoft.SourceLink.GitHub" Version="10.0.403" />
     </ItemGroup>
 
     <ItemGroup>
@@ -22,6 +22,26 @@
 
     <ItemGroup>
         <None Include="$(TargetPath)" Pack="true" PackagePath="analyzers/dotnet/cs/" />
+    </ItemGroup>
+
+    <!-- The types referenced by generated code are shipped as a regular library in the same package -->
+    <ItemGroup>
+        <ProjectReference Include="..\Skaar.ValueType.Abstractions\Skaar.ValueType.Abstractions.csproj"
+                          ReferenceOutputAssembly="false"
+                          SkipGetTargetFrameworkProperties="true"
+                          SetTargetFramework="TargetFramework=net8.0"
+                          PrivateAssets="all" />
+    </ItemGroup>
+    <PropertyGroup>
+        <!-- Nothing left for a symbol package; the abstractions assembly embeds its pdb -->
+        <IncludeSymbols>false</IncludeSymbols>
+        <!-- The analyzer targets netstandard2.0 while the library is net8.0 -->
+        <NoWarn>$(NoWarn);NU5128;NU5130</NoWarn>
+        <AbstractionsOutputPath>..\Skaar.ValueType.Abstractions\bin\$(Configuration)\net8.0\</AbstractionsOutputPath>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="$(AbstractionsOutputPath)Skaar.ValueType.Abstractions.dll" Pack="true" PackagePath="lib/net8.0/" Visible="false" />
+        <None Include="$(AbstractionsOutputPath)Skaar.ValueType.Abstractions.xml" Pack="true" PackagePath="lib/net8.0/" Visible="false" />
     </ItemGroup>
     
 </Project>

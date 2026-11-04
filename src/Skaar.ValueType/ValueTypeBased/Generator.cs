@@ -61,22 +61,6 @@ internal class Generator(string @namespace) : Common.Generator(@namespace)
             }
         });
     }
-    
-    public void GenerateInterface(IncrementalGeneratorInitializationContext context)
-    {
-        context.RegisterPostInitializationOutput(ctx =>
-        {
-            ctx.AddSource($"{InterfaceName}.g.cs", SourceText.From(InterfaceSource(InterfaceName), Encoding.UTF8));
-        });
-    } 
-    
-    public void GenerateConverters(IncrementalGeneratorInitializationContext context)
-    {
-        context.RegisterPostInitializationOutput(ctx =>
-        {
-            ctx.AddSource($"StructBasedJsonConverter.g.cs", SourceText.From(JsonConverterSource(JsonConverterName), Encoding.UTF8));
-        });
-    }
 
     private bool HasConstructorDefined(INamedTypeSymbol? symbol, ITypeSymbol parameterType)
     {
@@ -141,61 +125,4 @@ internal class Generator(string @namespace) : Common.Generator(@namespace)
                  }
                  """;
     }
-    private string InterfaceSource(string typeName) =>
-        $$"""
-          using System;
-
-          #nullable enable
-          #pragma warning disable CS0436 // Type may be defined multiple times
-          namespace {{Ns}};
-          /// <summary>
-          /// This is a marker interface for struct based value types
-          /// </summary>
-          {{GeneratedCodeAttribute}}
-          public interface {{typeName}}<T> : {{BaseInterfaceName}}<T> where T: struct
-          {
-               /// <summary>
-               /// <c>true</c> if the value is different from default, <c>false</c> otherwise.
-               /// </summary>
-               bool HasValue { get; }
-               
-               /// <summary>
-               /// A factory method to create a new instance of the value type.
-               /// Can be cast to the concrete type.
-               /// </summary>
-               static abstract {{typeName}}<T> Create(T value);
-          }
-               
-          """;
-    
-    private string JsonConverterSource(string jsonConverterName) =>
-        $$"""
-          using System;
-          using System.Text.Json;
-          using System.Text.Json.Serialization;
-          
-          #nullable enable
-          #pragma warning disable CS0436 // Type may be defined multiple times
-          namespace {{Ns}};
-          /// <summary>
-          /// This is a json converter for value types
-          /// </summary>
-          {{GeneratedCodeAttribute}}
-          public class {{jsonConverterName}}<T, TT> : JsonConverter<T> where T : struct, {{InterfaceName}}<TT> where TT: struct
-          {
-              public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-              {
-                  if (reader.TokenType == JsonTokenType.Null) return default;
-          
-                  var inner = JsonSerializer.Deserialize<TT>(ref reader, options);
-                  return (T) T.Create(inner);
-              }
-              
-              public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
-              {
-                  JsonSerializer.Serialize(writer, value.Value, options);
-              }
-          }
-               
-          """;
 }
