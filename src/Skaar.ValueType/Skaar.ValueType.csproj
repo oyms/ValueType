@@ -29,7 +29,6 @@
         <ProjectReference Include="..\Skaar.ValueType.Abstractions\Skaar.ValueType.Abstractions.csproj"
                           ReferenceOutputAssembly="false"
                           SkipGetTargetFrameworkProperties="true"
-                          SetTargetFramework="TargetFramework=net8.0"
                           PrivateAssets="all" />
     </ItemGroup>
     <PropertyGroup>
