@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/SolutionItems/">
+    <File Path="global.json" />
     <File Path="LICENSE" />
     <File Path="README.md" />
     <File Path="resources/logo.png" />
